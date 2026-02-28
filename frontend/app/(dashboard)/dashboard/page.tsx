@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { User } from '@/types';
 import { removeCookie } from '@/lib/cookies';
+import Link from 'next/link';
 
 // 👇 Función fuera del componente para leer el usuario
 const getStoredUser = (): User | null => {
@@ -49,10 +50,13 @@ export default function DashboardPage() {
         <p className="text-gray-500">Selecciona un módulo para comenzar</p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-          <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow cursor-pointer">
-            <h3 className="text-lg font-semibold">👥 Usuarios</h3>
-            <p className="text-gray-500 text-sm mt-1">Gestión de usuarios y roles</p>
-          </div>
+          {/* Reemplaza la card de usuarios */}
+          <Link href="/dashboard/users">
+            <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow cursor-pointer">
+              <h3 className="text-lg font-semibold">👥 Usuarios</h3>
+              <p className="text-gray-500 text-sm mt-1">Gestión de usuarios y roles</p>
+            </div>
+          </Link>
           <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow cursor-pointer">
             <h3 className="text-lg font-semibold">📦 Inventario</h3>
             <p className="text-gray-500 text-sm mt-1">Control de productos y stock</p>
