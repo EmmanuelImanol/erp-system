@@ -49,13 +49,11 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+    <main className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+      <div className="bg-white p-6 sm:p-8 rounded-lg shadow-md w-full max-w-md">
         <h1 className="text-2xl font-bold text-center mb-6">ERP System</h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-
-          {/* Email */}
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium">Email</label>
             <input
@@ -69,7 +67,6 @@ export default function LoginPage() {
             )}
           </div>
 
-          {/* Password */}
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium">Contraseña</label>
             <input
@@ -83,14 +80,12 @@ export default function LoginPage() {
             )}
           </div>
 
-          {/* Error general */}
           {errors.root && (
             <div className="bg-red-50 text-red-500 text-sm p-3 rounded-md">
               {errors.root.message}
             </div>
           )}
 
-          {/* Submit */}
           <button
             type="submit"
             disabled={isSubmitting}
@@ -98,7 +93,6 @@ export default function LoginPage() {
           >
             {isSubmitting ? 'Iniciando sesión...' : 'Iniciar sesión'}
           </button>
-
         </form>
       </div>
     </main>

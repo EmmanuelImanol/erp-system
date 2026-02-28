@@ -75,9 +75,9 @@ export default function UsersPage() {
         </button>
       </div>
 
-      {/* Tabla */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        <table className="w-full text-sm">
+      {/* Tabla con scroll horizontal en mobile */}
+      <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
+        <table className="w-full text-sm min-w-150">
           <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
             <tr>
               <th className="px-6 py-3 text-left">Nombre</th>
