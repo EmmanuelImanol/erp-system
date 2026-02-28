@@ -1,4 +1,12 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
+import { Role } from 'src/auth/enums/role.enum';
 
 export class CreateUserDto {
   @IsString({ message: 'Nombre no válido' })
@@ -12,4 +20,11 @@ export class CreateUserDto {
   @IsNotEmpty({ message: 'El password no puede ir vaio' })
   @MinLength(8, { message: 'El password debe tener al menos 8 caracteres' })
   password: string;
+
+  @IsOptional()
+  @IsEnum(Role)
+  role?: Role;
+
+  @IsOptional()
+  isActive?: boolean;
 }

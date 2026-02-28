@@ -23,7 +23,7 @@ export class UsersService {
   async createAccount(
     createUserDto: CreateUserDto,
   ): Promise<{ message: string }> {
-    const { email, password, name } = createUserDto;
+    const { email, password, name, role, isActive } = createUserDto;
 
     const userExists = await this.usersRepository.findOne({ where: { email } });
     if (userExists) {
@@ -34,6 +34,8 @@ export class UsersService {
       name,
       email,
       password: await hashPassword(password),
+      role,
+      isActive,
     });
 
     await this.usersRepository.save(user);

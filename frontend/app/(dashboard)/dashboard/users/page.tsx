@@ -4,11 +4,14 @@ import { useEffect, useState } from 'react';
 import { User } from '@/types';
 import api from '@/lib/axios';
 import { FiTrash2, FiEdit2, FiPlus } from 'react-icons/fi';
+import UserModal from '@/components/users/UserModal';
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -19,8 +22,7 @@ export default function UsersPage() {
       setLoading(true);
       const { data } = await api.get<User[]>('/users');
       setUsers(data);
-    } catch (error) {
-      console.log(error);
+    } catch {
       setError('Error al cargar los usuarios');
     } finally {
       setLoading(false);
@@ -37,6 +39,21 @@ export default function UsersPage() {
     }
   };
 
+  const handleEdit = (user: User) => {
+    setSelectedUser(user);
+    setIsModalOpen(true);
+  };
+
+  const handleCreate = () => {
+    setSelectedUser(null);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedUser(null);
+  };
+
   if (loading) return <p className="p-6 text-gray-500">Cargando usuarios...</p>;
   if (error) return <p className="p-6 text-red-500">{error}</p>;
 
@@ -49,7 +66,10 @@ export default function UsersPage() {
           <p className="text-gray-500 text-sm">Gestión de usuarios del sistema</p>
         </div>
         {/* Botón nuevo usuario */}
-        <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+        <button 
+          onClick={handleCreate}
+          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+        >
           <FiPlus size={16} />
           Nuevo usuario
         </button>
@@ -95,7 +115,10 @@ export default function UsersPage() {
                 <td className="px-6 py-4">
                   <div className="flex gap-2">
                     {/* Botón editar */}
-                    <button className="p-1 text-blue-500 hover:text-blue-700 transition-colors">
+                    <button 
+                      onClick={() => handleEdit(user)}
+                      className="p-1 text-blue-500 hover:text-blue-700 transition-colors"
+                    >
                       <FiEdit2 size={16} />
                     </button>
                     {/* Botón eliminar */}
@@ -116,6 +139,14 @@ export default function UsersPage() {
           <p className="text-center text-gray-500 py-8">No hay usuarios registrados</p>
         )}
       </div>
+
+      {/* Modal */}
+      <UserModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSuccess={fetchUsers}
+        user={selectedUser}
+      />
     </div>
   );
 }
