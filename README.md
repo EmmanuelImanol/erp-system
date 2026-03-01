@@ -78,7 +78,7 @@ npm run dev
 ### Auth
 | Method | Endpoint | Description | Auth |
 |--------|----------|-------------|------|
-| POST | `/auth/register` | Register user | ❌ |
+| POST | `/auth/register` | Register user | Admin only |
 | POST | `/auth/login` | Login | ❌ |
 
 ### Users
