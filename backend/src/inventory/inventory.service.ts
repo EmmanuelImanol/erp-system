@@ -8,6 +8,7 @@ import { Repository, Like, FindOptionsWhere } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { Category } from './enums/category.enum';
 
 @Injectable()
 export class InventoryService {
@@ -39,7 +40,7 @@ export class InventoryService {
       where.name = Like(`%${search}%`);
     }
     if (category) {
-      where.category = category;
+      where.category = category as Category;
     }
 
     return this.productRepository.find({
@@ -77,5 +78,11 @@ export class InventoryService {
     await this.findById(id);
     await this.productRepository.delete(id);
     return { message: 'Producto eliminado correctamente' };
+  }
+
+  async generateSku(): Promise<{ sku: string }> {
+    const count = await this.productRepository.count();
+    const sku = `PROD-${String(count + 1).padStart(4, '0')}`;
+    return { sku };
   }
 }

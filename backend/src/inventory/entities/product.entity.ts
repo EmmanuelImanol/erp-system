@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Category } from '../enums/category.enum';
 
 @Entity('products')
 export class Product {
@@ -29,8 +30,8 @@ export class Product {
   @Column({ default: 0 })
   minStock: number; // para alertas de stock mínimo
 
-  @Column()
-  category: string;
+  @Column({ type: 'enum', enum: Category })
+  category: Category;
 
   @Column({ default: true })
   isAvailable: boolean;

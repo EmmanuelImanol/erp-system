@@ -17,6 +17,7 @@ import { JwtGuard } from '../auth/guards/jwt.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
+import { Category } from './enums/category.enum';
 
 @Controller('inventory')
 @UseGuards(JwtGuard, RolesGuard)
@@ -36,6 +37,18 @@ export class InventoryController {
     @Query('category') category?: string,
   ) {
     return this.inventoryService.findAll(search, category);
+  }
+
+  @Get('categories')
+  @Roles(Role.ADMIN, Role.MANAGER, Role.EMPLOYEE)
+  getCategories() {
+    return Object.values(Category);
+  }
+
+  @Get('generate-sku')
+  @Roles(Role.ADMIN, Role.MANAGER)
+  generateSku() {
+    return this.inventoryService.generateSku();
   }
 
   @Get('low-stock')

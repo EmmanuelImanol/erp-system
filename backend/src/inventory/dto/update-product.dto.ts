@@ -4,8 +4,10 @@ import {
   IsBoolean,
   IsOptional,
   Min,
+  IsEnum,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { Category } from '../enums/category.enum';
 
 export class UpdateProductDto {
   @IsOptional()
@@ -23,24 +25,23 @@ export class UpdateProductDto {
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  @Min(0)
+  @Min(0, { message: 'El precio no puede ser negativo' })
   price?: number;
 
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  @Min(0)
+  @Min(0, { message: 'El stock no puede ser negativo' })
   stock?: number;
 
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  @Min(0)
+  @Min(0, { message: 'El stock mínimo no puede ser negativo' })
   minStock?: number;
 
-  @IsOptional()
-  @IsString()
-  category?: string;
+  @IsEnum(Category)
+  category: Category;
 
   @IsOptional()
   @IsBoolean()

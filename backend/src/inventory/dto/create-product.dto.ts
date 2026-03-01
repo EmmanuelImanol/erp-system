@@ -5,8 +5,10 @@ import {
   IsOptional,
   MinLength,
   Min,
+  IsEnum,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { Category } from '../enums/category.enum';
 
 export class CreateProductDto {
   @IsString()
@@ -36,8 +38,8 @@ export class CreateProductDto {
   @Min(0)
   minStock: number;
 
-  @IsString()
-  category: string;
+  @IsEnum(Category)
+  category: Category;
 
   @IsOptional()
   @IsBoolean()

@@ -32,52 +32,79 @@ interface ProductModalProps {
 
 export default function ProductModal({ isOpen, onClose, onSuccess, product }: ProductModalProps) {
   const [error, setError] = useState<string | null>(null);
+  const [categories, setCategories] = useState<string[]>([]);
   const isEditing = !!product;
 
   const {
-  register,
-  handleSubmit,
-  reset,
-  formState: { errors, isSubmitting },
-} = useForm<ProductForm>({
-  resolver: zodResolver(productSchema) as Resolver<ProductForm>,
-  defaultValues: {
-    sku: '',
-    name: '',
-    description: '',
-    price: 0,
-    stock: 0,
-    minStock: 0,
-    category: '',
-    isAvailable: true,
-  },
-});
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<ProductForm>({
+    resolver: zodResolver(productSchema) as Resolver<ProductForm>,
+    defaultValues: {
+      sku: '',
+      name: '',
+      description: '',
+      price: 0,
+      stock: 0,
+      minStock: 0,
+      category: '',
+      isAvailable: true,
+    },
+  });
 
+  // Cargar categorías al montar
   useEffect(() => {
-    if (product) {
-      reset({
-        sku: product.sku,
-        name: product.name,
-        description: product.description ?? '',
-        price: product.price,
-        stock: product.stock,
-        minStock: product.minStock,
-        category: product.category,
-        isAvailable: product.isAvailable,
-      });
-    } else {
-      reset({
-        sku: '',
-        name: '',
-        description: '',
-        price: 0,
-        stock: 0,
-        minStock: 0,
-        category: '',
-        isAvailable: true,
-      });
-    }
-  }, [product, reset]);
+    const loadCategories = async () => {
+      try {
+        const { data } = await api.get<string[]>('/inventory/categories');
+        setCategories(data);
+      } catch {
+        console.error('Error al cargar categorías');
+      }
+    };
+    loadCategories();
+  }, []);
+
+  // Cargar SKU y datos cuando se abre el modal
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const loadModalData = async () => {
+      if (product) {
+        reset({
+          sku: product.sku,
+          name: product.name,
+          description: product.description ?? '',
+          price: product.price,
+          stock: product.stock,
+          minStock: product.minStock,
+          category: product.category,
+          isAvailable: product.isAvailable,
+        });
+      } else {
+        reset({
+          sku: '',
+          name: '',
+          description: '',
+          price: 0,
+          stock: 0,
+          minStock: 0,
+          category: '',
+          isAvailable: true,
+        });
+        try {
+          const { data } = await api.get<{ sku: string }>('/inventory/generate-sku');
+          reset((prev) => ({ ...prev, sku: data.sku }));
+        } catch {
+          console.error('Error al generar SKU');
+        }
+      }
+    };
+
+    loadModalData();
+  }, [isOpen, product, reset]);
 
   const onSubmit = async (data: ProductForm) => {
     setError(null);
@@ -114,24 +141,31 @@ export default function ProductModal({ isOpen, onClose, onSuccess, product }: Pr
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
 
-          {/* SKU y Nombre */}
+          {/* SKU y Categoría */}
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium dark:text-gray-200">SKU</label>
               <input
                 {...register('sku')}
-                className="border dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                readOnly={isEditing}
+                className={`border dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  isEditing ? 'opacity-60 cursor-not-allowed' : ''
+                }`}
                 placeholder="PROD-001"
               />
               {errors.sku && <span className="text-red-500 text-xs">{errors.sku.message}</span>}
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium dark:text-gray-200">Categoría</label>
-              <input
+              <select
                 {...register('category')}
                 className="border dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Electrónica"
-              />
+              >
+                <option value="">Selecciona una categoría</option>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
               {errors.category && <span className="text-red-500 text-xs">{errors.category.message}</span>}
             </div>
           </div>
@@ -166,6 +200,7 @@ export default function ProductModal({ isOpen, onClose, onSuccess, product }: Pr
                 {...register('price')}
                 type="number"
                 step="0.01"
+                min="0"
                 className="border dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.price && <span className="text-red-500 text-xs">{errors.price.message}</span>}
@@ -175,6 +210,7 @@ export default function ProductModal({ isOpen, onClose, onSuccess, product }: Pr
               <input
                 {...register('stock')}
                 type="number"
+                min="0"
                 className="border dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.stock && <span className="text-red-500 text-xs">{errors.stock.message}</span>}
@@ -184,6 +220,7 @@ export default function ProductModal({ isOpen, onClose, onSuccess, product }: Pr
               <input
                 {...register('minStock')}
                 type="number"
+                min="0"
                 className="border dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.minStock && <span className="text-red-500 text-xs">{errors.minStock.message}</span>}
