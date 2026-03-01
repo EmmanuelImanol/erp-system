@@ -23,3 +23,16 @@ export interface ApiError {
   error: string;
   statusCode: number;
 }
+
+export interface Product {
+  id: string;
+  sku: string;
+  name: string;
+  description?: string;
+  price: number;
+  stock: number;
+  minStock: number;
+  category: string;
+  isAvailable: boolean;
+  createdAt: string;
+}
