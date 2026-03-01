@@ -8,6 +8,7 @@ import api from '@/lib/axios';
 import { AuthResponse, ApiError } from '@/types';
 import { AxiosError } from 'axios';
 import { setCookie } from '@/lib/cookies';
+import { useEffect } from 'react';
 
 const loginSchema = z.object({
   email: z.string().email('El email no es válido'),
@@ -18,6 +19,11 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
+
+  useEffect(() => {
+    // Despierta el backend en cuanto el usuario abre el login
+    api.get('/health').catch(() => {});
+  }, []);
 
   const {
     register,
@@ -91,7 +97,15 @@ export default function LoginPage() {
             disabled={isSubmitting}
             className="bg-blue-600 text-white py-2 rounded-md font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
           >
-            {isSubmitting ? 'Iniciando sesión...' : 'Iniciar sesión'}
+            {isSubmitting ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                </svg>
+                Conectando...
+              </span>
+            ) : 'Iniciar sesión'}
           </button>
         </form>
       </div>
